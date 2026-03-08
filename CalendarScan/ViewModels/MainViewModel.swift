@@ -19,8 +19,15 @@ final class MainViewModel {
             try await calendarService.setup()
             hasCalendarAccess = true
             refreshEvents()
+        } catch CalendarError.accessDenied {
+            // Permission was denied — keep hasCalendarAccess false to show the prompt
+            errorMessage = CalendarError.accessDenied.errorDescription
         } catch {
+            // Permission was granted but calendar creation failed (e.g. account restrictions).
+            // Allow the main UI to load and surface the error as a banner instead.
+            hasCalendarAccess = true
             errorMessage = error.localizedDescription
+            refreshEvents()
         }
     }
 

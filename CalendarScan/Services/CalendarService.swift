@@ -26,16 +26,24 @@ final class CalendarService {
         let calendar = EKCalendar(for: .event, eventStore: store)
         calendar.title = calendarName
 
-        // Prefer iCloud so events sync to iPhone; fall back to local storage
-        let source = store.sources.first(where: { $0.sourceType == .calDAV })
-                  ?? store.sources.first(where: { $0.sourceType == .exchange })
-                  ?? store.sources.first(where: { $0.sourceType == .local })
+        // Try sources in priority order; some accounts (e.g. iCloud, Exchange) may reject
+        // calendar creation — fall through to the next source if saveCalendar throws.
+        let candidates = [
+            store.sources.first(where: { $0.sourceType == .calDAV }),
+            store.sources.first(where: { $0.sourceType == .exchange }),
+            store.sources.first(where: { $0.sourceType == .local })
+        ].compactMap { $0 }
 
-        guard let source else { throw CalendarError.noCalendarSource }
-        calendar.source = source
+        guard !candidates.isEmpty else { throw CalendarError.noCalendarSource }
 
-        try store.saveCalendar(calendar, commit: true)
-        return calendar
+        for source in candidates {
+            calendar.source = source
+            if (try? store.saveCalendar(calendar, commit: true)) != nil {
+                return calendar
+            }
+        }
+
+        throw CalendarError.noCalendarSource
     }
 
     // MARK: - Event Fetching
