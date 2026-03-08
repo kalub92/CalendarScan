@@ -1,0 +1,28 @@
+name: CalendarScan
+options:
+  bundleIdPrefix: com.calebstultz
+  deploymentTarget:
+    iOS: "18.0"
+  createIntermediateGroups: true
+
+targets:
+  CalendarScan:
+    type: application
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - CalendarScan
+    info:
+      path: CalendarScan/Info.plist
+      properties:
+        UILaunchScreen: {}
+        CFBundleDisplayName: CalendarScan
+        NSCameraUsageDescription: "CalendarScan needs camera access to photograph your paper calendar."
+        NSCalendarsUsageDescription: "CalendarScan needs calendar access to create and sync events from your scanned calendar."
+        NSCalendarsWriteOnlyAccessUsageDescription: "CalendarScan needs write access to create calendar events from your scanned calendar."
+    settings:
+      base:
+        SWIFT_VERSION: "5.9"
+        PRODUCT_BUNDLE_IDENTIFIER: com.calebstultz.CalendarScan
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
